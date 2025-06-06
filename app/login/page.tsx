@@ -1,40 +1,86 @@
 "use client";
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Code } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { ThemeToggle } from "@/components/theme-toggle";
+import {
+  authRefreshAction,
+  loginUser,
+  resetloginUser,
+} from "../redux/authSlice";
+import { useAppDispatch } from "../redux/redux/hooks";
+import {
+  loginData,
+  loginError,
+  loginIsError,
+  loginIsLoading,
+  loginIsSuccess,
+  resetRefreshction,
+} from "../redux/authSlice";
+
+import { useSelector } from "react-redux";
+import toast from "react-hot-toast";
+import { useAuthRedirect } from "../hooks/useAuthRedirect";
+import Loader from "@/components/Loader";
 
 export default function LoginPage() {
+  const { isChecking } = useAuthRedirect({ redirectIfAuthenticated: true });
+  const dispatch = useAppDispatch();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+
   const router = useRouter();
+  const data = useSelector(loginData);
+  const isLoading = useSelector(loginIsLoading);
+  const isError = useSelector(loginIsError);
+  const error = useSelector(loginError);
+  const isSuccess = useSelector(loginIsSuccess);
+
+  useEffect(() => {
+    if (isSuccess) {
+      console.log("isSuccessisSuccess", isSuccess);
+      localStorage.setItem("token", data?.access_token);
+      localStorage.setItem("sessionId", data?.session_state);
+      localStorage.setItem("refresh_token", data?.refresh_token);
+      dispatch(resetloginUser());
+
+      toast.success("Login successful!");
+      router.push("/dashboard");
+    }
+
+    if (isError) {
+      toast.error(error || "Login failed.");
+      dispatch(resetloginUser());
+    }
+  }, [dispatch, isSuccess, isError]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    
-    // Simulate authentication delay
-    setTimeout(() => {
-      setIsLoading(false);
-      router.push("/dashboard");
-    }, 1000);
+    const payload = { email, password };
+    dispatch(loginUser(payload));
   };
+
+  if (isChecking) return <Loader />;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
       <div className="absolute top-4 right-4">
         <ThemeToggle />
       </div>
-      
+
       <Card className="w-full max-w-md shadow-lg border-border/30">
         <CardHeader className="space-y-2 text-center">
           <div className="flex justify-center mb-2">
@@ -43,9 +89,7 @@ export default function LoginPage() {
             </div>
           </div>
           <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
-          <CardDescription>
-            Sign in to your account to continue
-          </CardDescription>
+          <CardDescription>Sign in to your account to continue</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -64,8 +108,8 @@ export default function LoginPage() {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
-                <Link 
-                  href="#" 
+                <Link
+                  href="#"
                   className="text-sm text-muted-foreground hover:text-primary transition-colors"
                 >
                   Forgot password?
@@ -105,7 +149,10 @@ export default function LoginPage() {
         <CardFooter className="flex justify-center border-t p-6">
           <p className="text-sm text-muted-foreground">
             Don&apos;t have an account?{" "}
-            <Link href="/signup" className="font-medium text-primary hover:underline">
+            <Link
+              href="/signup"
+              className="font-medium text-primary hover:underline"
+            >
               Sign up
             </Link>
           </p>

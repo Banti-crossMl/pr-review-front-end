@@ -9,12 +9,18 @@ import { CodeSearch } from "@/components/code-search";
 import { FileSidebar } from "@/components/file-sidebar";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { mockComparisons } from "@/lib/mock-data";
+import { useAuthRedirect } from "../hooks/useAuthRedirect";
+import { resetloginUser } from "../redux/authSlice";
+import { useAppDispatch } from "../redux/redux/hooks";
 
 export default function DashboardPage() {
+  useAuthRedirect({ redirectIfAuthenticated: false });
   const [comparisons, setComparisons] = useState(mockComparisons);
+
   const [activeFileId, setActiveFileId] = useState(
     mockComparisons[0]?.id || ""
   );
+  const dispatch = useAppDispatch();
   const [sidebarVisible, setSidebarVisible] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const router = useRouter();
@@ -52,6 +58,10 @@ export default function DashboardPage() {
   };
 
   const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("refresh_token");
+    localStorage.removeItem("sessionId");
+    dispatch(resetloginUser());
     router.push("/login");
   };
 

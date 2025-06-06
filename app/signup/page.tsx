@@ -8,10 +8,25 @@ import { Eye, EyeOff, Code } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { useAppDispatch } from "../redux/redux/hooks";
+import { signUpUser } from "../redux/signupSlice";
+import toast from "react-hot-toast";
+import { useAuthRedirect } from "../hooks/useAuthRedirect";
+import Loader from "@/components/Loader";
 
 export default function SignUpPage() {
+  const { isChecking } = useAuthRedirect({ redirectIfAuthenticated: true });
+
+  const dispatch = useAppDispatch();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [email, setEmail] = useState("");
@@ -26,38 +41,54 @@ export default function SignUpPage() {
       setPasswordError("Passwords do not match");
       return false;
     }
-    
+
     if (password.length < 8) {
       setPasswordError("Password must be at least 8 characters");
       return false;
     }
-    
+
     setPasswordError("");
     return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!validatePasswords()) {
-      return;
-    }
-    
+
+    if (!validatePasswords()) return;
+
     setIsLoading(true);
-    
-    // Simulate signup delay
-    setTimeout(() => {
+
+    try {
+      const resultAction = await dispatch(
+        signUpUser({ email, password, confirmPassword })
+      );
+
+      if (signUpUser.fulfilled.match(resultAction)) {
+        toast.success("Sign up successful!");
+        router.push("/dashboard");
+      } else {
+        toast.error(
+          typeof resultAction.payload === "string"
+            ? resultAction.payload
+            : "Sign up failed."
+        );
+      }
+    } catch (error) {
+      toast.error("Unexpected error occurred.");
+      console.error("Signup error:", error);
+    } finally {
       setIsLoading(false);
-      router.push("/dashboard");
-    }, 1000);
+    }
   };
+
+  if (isChecking) return <Loader />;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
       <div className="absolute top-4 right-4">
         <ThemeToggle />
       </div>
-      
+
       <Card className="w-full max-w-md shadow-lg border-border/30">
         <CardHeader className="space-y-2 text-center">
           <div className="flex justify-center mb-2">
@@ -65,10 +96,10 @@ export default function SignUpPage() {
               <Code className="h-6 w-6 text-primary" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
-          <CardDescription>
-            Enter your details to get started
-          </CardDescription>
+          <CardTitle className="text-2xl font-bold">
+            Create an account
+          </CardTitle>
+          <CardDescription>Enter your details to get started</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -151,7 +182,10 @@ export default function SignUpPage() {
         <CardFooter className="flex justify-center border-t p-6">
           <p className="text-sm text-muted-foreground">
             Already have an account?{" "}
-            <Link href="/login" className="font-medium text-primary hover:underline">
+            <Link
+              href="/login"
+              className="font-medium text-primary hover:underline"
+            >
               Sign in
             </Link>
           </p>
