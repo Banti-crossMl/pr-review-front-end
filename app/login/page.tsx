@@ -41,6 +41,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { access_token } = useSelector((state: any) => state.auth);
 
   const router = useRouter();
   const data = useSelector(loginData);
@@ -49,10 +50,13 @@ export default function LoginPage() {
   const error = useSelector(loginError);
   const isSuccess = useSelector(loginIsSuccess);
 
+  console.log("datadata", localStorage.getItem("token"));
+
   useEffect(() => {
     if (isSuccess) {
       console.log("isSuccessisSuccess", isSuccess);
-      localStorage.setItem("token", data?.access_token);
+      console.log("access_token", access_token);
+      localStorage.setItem("token", access_token);
       localStorage.setItem("sessionId", data?.session_state);
       localStorage.setItem("refresh_token", data?.refresh_token);
       dispatch(resetloginUser());
