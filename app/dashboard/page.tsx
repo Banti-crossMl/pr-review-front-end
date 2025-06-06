@@ -41,8 +41,6 @@ export default function DashboardPage() {
   const [showRepoCard, setShowRepoCard] = useState(false);
   const [showGitHubDialog, setShowGitHubDialog] = useState(false);
 
-  console.log("showGitHubDialogshowGitHubDialog", showGitHubDialog);
-
   const dispatch = useAppDispatch();
   const router = useRouter();
 

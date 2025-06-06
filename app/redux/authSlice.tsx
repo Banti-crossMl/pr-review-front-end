@@ -46,7 +46,7 @@ export const loginUser = createAsyncThunk<any, LoginPayload>(
   async (payload, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        `https://2dec-49-249-18-30.ngrok-free.app/auth/login/`,
+        `https://153b-49-249-18-30.ngrok-free.app/auth/login/`,
         payload,
         {
           headers: {
@@ -76,7 +76,7 @@ export const authRefreshAction = createAsyncThunk<any>(
       const refresh_token = localStorage.getItem("refresh_token");
 
       const response = await axios.post(
-        `https://2dec-49-249-18-30.ngrok-free.app/auth/refresh-token`,
+        `https://153b-49-249-18-30.ngrok-free.app/auth/refresh-token`,
         {
           refresh_token,
           grant_type: "refresh_token",
