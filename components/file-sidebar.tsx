@@ -13,7 +13,11 @@ interface FileSidebarProps {
   onSelectFile: (id: string) => void;
 }
 
-export function FileSidebar({ files, activeFileId, onSelectFile }: FileSidebarProps) {
+export function FileSidebar({
+  files,
+  activeFileId,
+  onSelectFile,
+}: FileSidebarProps) {
   const [isOpen, setIsOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -54,7 +58,11 @@ export function FileSidebar({ files, activeFileId, onSelectFile }: FileSidebarPr
         <div className="flex h-14 items-center justify-between border-b px-4">
           <h2 className="text-lg font-semibold">Files</h2>
           {isMobile && (
-            <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsOpen(false)}
+            >
               <X className="h-4 w-4" />
             </Button>
           )}

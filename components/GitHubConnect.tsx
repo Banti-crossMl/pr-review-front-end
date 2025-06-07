@@ -6,12 +6,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { connectTokenAction } from "@/app/redux/features/connecttokenSlice";
+import { useAppDispatch } from "@/app/redux/redux/hooks";
+import { useSelector } from "react-redux";
 
 export function GitHubConnect() {
   const [githubToken, setGithubToken] = useState("");
   const [hasToken, setHasToken] = useState(false);
+  const dispatch = useAppDispatch();
   const [tokenInput, setTokenInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const { connectToken } = useSelector((state: any) => state.tokenres);
 
   // Check for existing token on component mount
   useEffect(() => {
@@ -29,10 +35,7 @@ export function GitHubConnect() {
 
     // Simulate API validation (replace with actual GitHub API call)
     try {
-      // You can add GitHub API validation here
-      // const response = await fetch('https://api.github.com/user', {
-      //   headers: { Authorization: `token ${tokenInput}` }
-      // });
+      dispatch(connectTokenAction({ token: tokenInput }));
 
       setTimeout(() => {
         setGithubToken(tokenInput);

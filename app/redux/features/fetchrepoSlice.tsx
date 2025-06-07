@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import axiosInstance from "../axiosConfig";
 import { toast } from "react-hot-toast";
+import axios from "axios";
 
 // Types
 interface FetchRepoPayload {
