@@ -1,12 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, ChevronUp, Code as CodeIcon, FileCode, Eye, Plus, Minus, MessageSquare } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  Code as CodeIcon,
+  FileCode,
+  Eye,
+  Plus,
+  Minus,
+  MessageSquare,
+} from "lucide-react";
 import { CopyButton } from "@/components/ui/copy-button";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import ReactMarkdown from "react-markdown";
 
 interface CodeBlockProps {
   filename: string;
@@ -37,34 +47,38 @@ export function CodeBlock({
   });
 
   // Split code into lines and compare
-  const oldLines = oldCode.split('\n');
-  const newLines = newCode.split('\n');
-  
+  const oldLines = oldCode.split("\n");
+  const newLines = newCode.split("\n");
+
   // Simple line-by-line comparison
   const getLineStatus = (line: string, index: number, isOld: boolean) => {
     if (isOld) {
-      return newLines[index] !== line ? 'removed' : 'unchanged';
+      return newLines[index] !== line ? "removed" : "unchanged";
     } else {
-      return oldLines[index] !== line ? 'added' : 'unchanged';
+      return oldLines[index] !== line ? "added" : "unchanged";
     }
   };
 
   const renderCode = (code: string, isOld: boolean) => {
-    const lines = code.split('\n');
+    const lines = code.split("\n");
     return lines.map((line, index) => {
       const status = getLineStatus(line, index, isOld);
-      const bgColor = status === 'removed' ? 'bg-red-500/10' 
-                   : status === 'added' ? 'bg-green-500/10'
-                   : '';
-      const icon = status === 'removed' ? <Minus className="h-3 w-3 text-red-500" />
-                : status === 'added' ? <Plus className="h-3 w-3 text-green-500" />
-                : null;
-      
+      const bgColor =
+        status === "removed"
+          ? "bg-red-500/10"
+          : status === "added"
+          ? "bg-green-500/10"
+          : "";
+      const icon =
+        status === "removed" ? (
+          <Minus className="h-3 w-3 text-red-500" />
+        ) : status === "added" ? (
+          <Plus className="h-3 w-3 text-green-500" />
+        ) : null;
+
       return (
         <div key={index} className={cn("flex items-start gap-2 px-1", bgColor)}>
-          <div className="w-4 flex-shrink-0 pt-1">
-            {icon}
-          </div>
+          <div className="w-4 flex-shrink-0 pt-1">{icon}</div>
           <pre className="flex-1">{line}</pre>
         </div>
       );
@@ -97,7 +111,11 @@ export function CodeBlock({
             className="h-8 w-8 p-0"
             onClick={() => setExpanded(!expanded)}
           >
-            {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            {expanded ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
             <span className="sr-only">{expanded ? "Collapse" : "Expand"}</span>
           </Button>
         </div>
@@ -105,7 +123,7 @@ export function CodeBlock({
 
       {/* Summary always visible */}
       <CardContent className="p-4 pb-0">
-        <p className="text-sm text-foreground/90 mb-4">{summary}</p>
+        <ReactMarkdown>{summary}</ReactMarkdown>
         <div className="flex flex-wrap items-center text-xs text-muted-foreground mb-4 gap-x-4 gap-y-2">
           <div className="flex items-center">
             <Eye className="h-3 w-3 mr-1" />
@@ -134,7 +152,9 @@ export function CodeBlock({
               <div className="font-mono text-xs p-3 rounded-md bg-muted/70 overflow-x-auto">
                 {renderCode(oldCode, true)}
               </div>
-              <div className="text-xs mt-1 text-muted-foreground">Original code</div>
+              <div className="text-xs mt-1 text-muted-foreground">
+                Original code
+              </div>
             </div>
             <div className="relative">
               <div className="absolute top-2 right-2 z-10">
@@ -143,7 +163,9 @@ export function CodeBlock({
               <div className="font-mono text-xs p-3 rounded-md bg-muted/30 overflow-x-auto">
                 {renderCode(newCode, false)}
               </div>
-              <div className="text-xs mt-1 text-muted-foreground">Updated code</div>
+              <div className="text-xs mt-1 text-muted-foreground">
+                Updated code
+              </div>
             </div>
           </div>
         </CardContent>

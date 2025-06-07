@@ -187,13 +187,8 @@ export function Chat({
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Get Redux state
-  const {
-    messages,
-    chatErrorMessage,
-    isChatError,
-    isChatLoading,
-    isChatSuccess,
-  } = useSelector((state: any) => state.chat);
+  const { messages, chatErrorMessage, isChatError, isChatLoading } =
+    useSelector((state: any) => state.chat);
 
   const dispatch = useAppDispatch();
 

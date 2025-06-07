@@ -45,7 +45,9 @@ export const sendChatMessage = createAsyncThunk(
   async ({ msg }: SendMessagePayload, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post("/bot/chat/", { message: msg });
-      console.log(response);
+      if (response.data) {
+        localStorage.setItem("chatSessionId", response?.data?.session_id);
+      }
       return response.data; // ✅ Return the entire response object
     } catch (error: any) {
       const message =

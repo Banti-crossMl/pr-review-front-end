@@ -11,7 +11,7 @@ import { useAppDispatch } from "@/app/redux/redux/hooks";
 import { useSelector } from "react-redux";
 
 export function GitHubConnect() {
-  const [githubToken, setGithubToken] = useState("");
+  const [githubToken, setGithubToken] = useState(""); // Only stored in memory
   const [hasToken, setHasToken] = useState(false);
   const dispatch = useAppDispatch();
   const [tokenInput, setTokenInput] = useState("");
@@ -19,12 +19,12 @@ export function GitHubConnect() {
 
   const { connectToken } = useSelector((state: any) => state.tokenres);
 
-  // Check for existing token on component mount
+  // Check for existing connection status on component mount
   useEffect(() => {
-    const storedToken = localStorage.getItem("github_token");
-    if (storedToken) {
-      setGithubToken(storedToken);
+    const isConnected = localStorage.getItem("github_connected");
+    if (isConnected === "true") {
       setHasToken(true);
+      // Note: Token is not restored from localStorage for security
     }
   }, []);
 
@@ -38,9 +38,10 @@ export function GitHubConnect() {
       dispatch(connectTokenAction({ token: tokenInput }));
 
       setTimeout(() => {
-        setGithubToken(tokenInput);
+        setGithubToken(tokenInput); // Store only in memory
         setHasToken(true);
-        localStorage.setItem("github_token", tokenInput);
+        // Only store connection status flag, not the token
+        localStorage.setItem("github_connected", "true");
         setTokenInput("");
         setIsLoading(false);
       }, 1000);
@@ -51,15 +52,18 @@ export function GitHubConnect() {
   };
 
   const handleTokenDisconnect = () => {
-    setGithubToken("");
+    setGithubToken(""); // Clear from memory
     setHasToken(false);
-    localStorage.removeItem("github_token");
+    // Set connection flag to false
+    localStorage.setItem("github_connected", "false");
   };
 
   const handleUpdateToken = () => {
     setHasToken(false);
-    setGithubToken("");
+    setGithubToken(""); // Clear from memory
     setTokenInput("");
+    // Set connection flag to false since we're updating
+    localStorage.setItem("github_connected", "false");
   };
 
   return (

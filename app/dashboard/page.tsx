@@ -82,6 +82,28 @@ export default function DashboardPage() {
   const [showGitHubDialog, setShowGitHubDialog] = useState(false);
   const [showChatBot, setShowChatBot] = useState(false);
 
+  // Add state for github_connected with proper SSR handling
+  const [github_connected, setGithub_connected] = useState(null);
+
+  useEffect(() => {
+    // Set initial value
+    const initialValue: any = localStorage.getItem("github_connected");
+    setGithub_connected(initialValue);
+
+    // Poll for changes every 500ms
+    const interval: NodeJS.Timeout = setInterval(() => {
+      const currentValue = localStorage.getItem("github_connected");
+      setGithub_connected((prev: any) => {
+        if (prev !== currentValue) {
+          return currentValue;
+        }
+        return prev;
+      });
+    }, 500);
+
+    return () => clearInterval(interval);
+  }, []);
+
   const dispatch = useAppDispatch();
   const router = useRouter();
 
@@ -135,9 +157,7 @@ export default function DashboardPage() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("refresh_token");
-    localStorage.removeItem("sessionId");
+    localStorage.clear();
     dispatch(resetloginUser());
     router.push("/login");
   };
@@ -153,8 +173,6 @@ export default function DashboardPage() {
 
   const activeComparison =
     comparisons.find((comp: any) => comp.id === activeFileId) || comparisons[0];
-
-  console.log("activeComparison", activeComparison);
 
   const severityStyles: Record<string, string> = {
     HIGH: "bg-red-100 text-red-700 border-red-300",
@@ -173,6 +191,10 @@ export default function DashboardPage() {
       </span>
     );
   }
+
+  const handlechatboat = () => {
+    setShowChatBot(!showChatBot);
+  };
 
   return (
     <div className="min-h-screen bg-background relative">
@@ -227,15 +249,18 @@ export default function DashboardPage() {
               <span className="sr-only">GitHub Connect</span>
             </Button>
 
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handlerepo}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              <Github className="h-5 w-5" />
-              <span className="sr-only">Open Repository</span>
-            </Button>
+            {github_connected && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handlerepo}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <Github className="h-5 w-5" />
+                <span className="sr-only">Open Repository</span>
+              </Button>
+            )}
+
             <ThemeToggle />
             <Button
               variant="ghost"
@@ -291,7 +316,7 @@ export default function DashboardPage() {
                   <div className="bg-muted/50 rounded-lg p-4 border">
                     <h3 className="font-semibold mb-2">Review Summary</h3>
                     <div className="text-sm text-muted-foreground whitespace-pre-wrap">
-                      {pullRequests.data.summary}
+                      <ReactMarkdown>{pullRequests.data.summary}</ReactMarkdown>
                     </div>
                   </div>
                 )}
@@ -475,7 +500,8 @@ export default function DashboardPage() {
         {/* Floating ChatBot Button */}
         <div className="fixed bottom-6 right-6 z-50">
           <Button
-            onClick={() => setShowChatBot(!showChatBot)}
+            // onClick={() => setShowChatBot(!showChatBot)}
+            onClick={handlechatboat}
             className="rounded-full h-14 w-14 p-0 shadow-lg bg-primary text-white hover:bg-primary/90"
           >
             💬
