@@ -24,7 +24,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { useAuthRedirect } from "../hooks/useAuthRedirect";
 import { resetloginUser } from "../redux/authSlice";
 import { useAppDispatch } from "../redux/redux/hooks";
-import { RepositoryCard } from "../connectrepo/page";
+import RepositoryCard from "@/components/RepositoryCard";
 import { fetchRepoAction } from "../redux/features/fetchrepoSlice";
 import { useSelector } from "react-redux";
 import Loader from "@/components/Loader";
@@ -341,7 +341,13 @@ export default function DashboardPage() {
                               {...props}
                             />
                           ),
-                          code: ({ inline, className, children, ...props }) =>
+                          code: ({
+                            node,
+                            inline,
+                            className,
+                            children,
+                            ...props
+                          }: any) =>
                             inline ? (
                               <code className="bg-gray-200 px-1 rounded text-[13px]">
                                 {children}
